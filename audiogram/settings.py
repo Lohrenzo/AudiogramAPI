@@ -58,13 +58,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "audiogram.urls"
@@ -72,7 +71,7 @@ ROOT_URLCONF = "audiogram.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "build")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -92,16 +91,25 @@ WSGI_APPLICATION = "audiogram.wsgi.application"
 
 DATABASES = {
     "default": {
-        # "ENGINE": "django.db.backends.sqlite3",
-        # "NAME": BASE_DIR / "db.sqlite3",
-        "ENGINE": config("DB_ENGINE"),
-        "HOST": config("DB_HOST"),
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "PORT": config("DB_PORT"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+        # "ENGINE": config("DB_ENGINE"),
+        # "HOST": config("DB_HOST"),
+        # "NAME": config("DB_NAME"),
+        # "USER": config("DB_USER"),
+        # "PASSWORD": config("DB_PASSWORD"),
+        # "PORT": config("DB_PORT"),
     }
 }
+
+
+# Email
+EMAIL_BACKEND = config("EMAIL_BACKEND")
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS")
 
 
 # Password validation
@@ -139,8 +147,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "build/static"),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles', 'static')
 
 MEDIA_URL = "media/"
@@ -170,10 +180,13 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ],
-    "DEFAULT_THROTTLE_RATES": {"anon": "404/minute", "user": "100/hour"},
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "600/minute",
+        "user": "100/hour",
+    },
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:5173",
 #     # "http://127.0.0.1:8000"
@@ -186,6 +199,26 @@ AUTHENTICATION_BACKENDS = [
     "account.backends.EmailOrUsernameModelBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+DJOSER = {
+    "USER_ID_FIELD": "username",
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    "SET_PASSWORD_RETYPE": True,
+    "SEND_CONFIRMATION_EMAIL": True,
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "USERNAME_RESET_CONFIRM_URL": "username/reset/confirm/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    # "LOGIN_FIELD": "email" # Uses email address as the username
+    # "LOGOUT_ON_PASSWORD_CHANGE": True,
+    "SERIALIZERS": {
+        "user_create": "account.serializers.UserRegistrationSerializer",
+        "user": "account.serializers.UserRegistrationSerializer",
+        "user_delete": "djoser.serializers.UserDeleteSerializer",
+    },
+}
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),

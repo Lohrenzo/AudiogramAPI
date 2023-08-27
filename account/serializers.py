@@ -1,11 +1,13 @@
 from django.contrib.auth.password_validation import validate_password
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from .models import User
 
 
-class UserRegistrationSerializer(serializers.Serializer):
+# class UserRegistrationSerializer(serializers.Serializer):
+class UserRegistrationSerializer(UserCreateSerializer):
     username = serializers.CharField(required=True)
     email = serializers.EmailField(
         required=True,

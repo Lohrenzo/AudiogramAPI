@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
 
@@ -34,7 +34,7 @@ class AccountManager(BaseUserManager):
         user.save(using=self._db)
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, unique=True)
     username = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=100)
@@ -44,15 +44,16 @@ class User(AbstractBaseUser):
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name="date joined")
     last_login = models.DateTimeField(auto_now_add=True, verbose_name="last login")
     is_active = models.BooleanField(default=True)
-    is_customer = models.BooleanField(verbose_name="Customer", default=True)
-    is_artist = models.BooleanField(verbose_name="Artist", default=False)
+    is_customer = models.BooleanField(verbose_name="Is Customer", default=True)
+    is_artist = models.BooleanField(verbose_name="Is Artist", default=False)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
+    objects = AccountManager()
+
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email", "first_name"]
-    objects = AccountManager()
 
     def __str__(self) -> str:
         return f"{self.username}"
