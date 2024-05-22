@@ -77,6 +77,12 @@ class AudioSerializer(serializers.ModelSerializer):
             UniqueValidator(queryset=Audio.objects.all()),
         ],
     )  # Unique Validator for title. 1st Method
+    album = serializers.SlugRelatedField(
+        queryset=Album.objects.all(),
+        slug_field="title",
+        required=False,  # Make the album field optional
+        allow_null=True,
+    )
     published = serializers.DateTimeField(read_only=True)
     edited = serializers.DateTimeField(read_only=True)
 
@@ -99,18 +105,16 @@ class AudioSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        album_title = self.context["request"].data.get(
-            "title"
-        )  # Retrieve title from request data
-        album_cover = self.context["request"].data.get(
-            "cover"
-        )  # Retrieve cover from request data
-        album, _ = Album.objects.get_or_create(
-            title=f"{album_title} - Single",
-            cover=album_cover,
-            artist=validated_data.get("artist"),
-        )
-        validated_data["album"] = album
+        if "album" not in validated_data or not validated_data["album"]:
+            # Create a new album if no album is provided
+            album_title = f"{validated_data['title']} - Single"
+            album_cover = validated_data.get("cover")
+            album, created = Album.objects.get_or_create(
+                title=album_title,
+                artist=validated_data.get("artist"),
+                defaults={"cover": album_cover},
+            )
+            validated_data["album"] = album
         return super().create(validated_data)
 
 

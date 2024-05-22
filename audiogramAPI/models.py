@@ -1,4 +1,6 @@
 # from account.models import User
+import re
+
 from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
@@ -12,16 +14,25 @@ from .validators import (
 )
 
 
+def format_title(title):
+    # Replace spaces with underscores and cap to 20 characters
+    return re.sub(r"\s+", "_", title.lower())[:20]
+
+
 def album_cover_upload_path(instance, filename):
-    return f"{instance.id}/album_covers/{filename}"
+    # formatted_title = format_title(instance.title)
+    # return f"{formatted_title}/album_covers/{filename}"
+    return f"album_covers/{filename.lower()}"
 
 
 def audio_cover_upload_path(instance, filename):
-    return f"{instance.id}/audio_covers/{filename}"
+    # formatted_title = format_title(instance.title)
+    return f"audio_covers/{filename.lower()}"
 
 
 def audio_file_upload_path(instance, filename):
-    return f"{instance.id}/audios/{filename}"
+    # formatted_title = format_title(instance.title)
+    return f"audios/{filename.lower()}"
 
 
 class Genre(models.Model):
