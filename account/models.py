@@ -1,4 +1,8 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 
 
@@ -39,13 +43,29 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=200, null=True, blank=True)
-    profile_pic = models.ImageField(upload_to="img/account", null=True, blank=True)
+    profile_pic = models.ImageField(
+        upload_to="img/account",
+        null=True,
+        blank=True,
+    )
     bio = models.TextField(max_length=2000, null=True, blank=True, default="")
-    date_joined = models.DateTimeField(auto_now_add=True, verbose_name="date joined")
-    last_login = models.DateTimeField(auto_now_add=True, verbose_name="last login")
+    date_joined = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="date joined",
+    )
+    last_login = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="last login",
+    )
     is_active = models.BooleanField(default=True)
-    is_customer = models.BooleanField(verbose_name="Is Customer", default=True)
-    is_artist = models.BooleanField(verbose_name="Is Artist", default=False)
+    is_listener = models.BooleanField(
+        verbose_name="Is Listener",
+        default=False,
+    )
+    is_artist = models.BooleanField(
+        verbose_name="Is Artist",
+        default=False,
+    )
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)

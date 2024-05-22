@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
+    "django_filters",
     # "rest_framework_simplejwt",
     # "rest_framework_simplejwt.token_blacklist",
 ]
@@ -166,6 +167,10 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
         # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
@@ -188,9 +193,14 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
 #     "http://localhost:5173",
-#     # "http://127.0.0.1:8000"
+#     "http://localhost:4173",
+#     "http://127.0.0.1:8000",
 # ]
+
+# To allow cookies and authentication to be sent with the request
+CORS_ALLOW_CREDENTIALS = True
 
 # Custom user model
 AUTH_USER_MODEL = "account.User"
@@ -211,18 +221,23 @@ DJOSER = {
     "USERNAME_RESET_CONFIRM_URL": "username/reset/confirm/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL": True,
     "ACTIVATION_URL": "activate/{uid}/{token}",
-    # "LOGIN_FIELD": "email" # Uses email address as the username
+    # "LOGIN_FIELD": "email",  # Uses email address as the username
     # "LOGOUT_ON_PASSWORD_CHANGE": True,
     "SERIALIZERS": {
-        "user_create": "account.serializers.UserRegistrationSerializer",
-        "user": "account.serializers.UserRegistrationSerializer",
+        "user": "account.serializers.UserListenerSerializer",  # Serializer for user retrieval
+        "user_create": [
+            "account.serializers.UserListenerSerializer",
+            "account.serializers.UserArtistSerializer",
+        ],
         "user_delete": "djoser.serializers.UserDeleteSerializer",
     },
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=0.5),
+    # "ACCESS_TOKEN_LIFETIME": timedelta(seconds=10),
+    # "REFRESH_TOKEN_LIFETIME": timedelta(seconds=15),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,

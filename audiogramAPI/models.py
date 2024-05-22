@@ -6,7 +6,10 @@ from django.shortcuts import get_object_or_404
 
 # from django.db.models.signals import pre_save
 # from .helpers import get_audio_length
-from .validators import validate_cover_image_size, validate_image_file_extension
+from .validators import (
+    validate_cover_image_size,
+    validate_image_file_extension,
+)
 
 
 def album_cover_upload_path(instance, filename):
@@ -47,6 +50,8 @@ class Album(models.Model):
         upload_to=album_cover_upload_path,
         validators=[validate_cover_image_size, validate_image_file_extension],
     )
+    published = models.DateTimeField(auto_now_add=True)
+
     # slug = models.SlugField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -107,6 +112,7 @@ class Audio(models.Model):
     likes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="likes",
+        default=None,
         blank=True,
     )
     genre = models.ForeignKey(
@@ -147,7 +153,29 @@ class Audio(models.Model):
 
     class Meta:
         verbose_name_plural = "Audios"
-        ordering = ("title",)
+        ordering = (
+            "title",
+            "genre",
+            "producer",
+            "published",
+        )
 
     def __str__(self) -> str:
         return f"{self.title} by {self.artist}"
+
+
+class Playlist(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="playlist_creator",
+    )
+    audios = models.ManyToManyField(Audio, related_name="playlist_audios")
+
+    class Meta:
+        verbose_name_plural = "Playlists"
+
+    def __str__(self) -> str:
+        return self.title
