@@ -1,30 +1,21 @@
-from rest_framework import (
-    generics,
-    status,
-    # viewsets,
-)
-from rest_framework.parsers import (
-    # FormParser,
-    MultiPartParser,
-    JSONParser,
-)
-from rest_framework.permissions import (
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, status  # viewsets,
+from rest_framework.parsers import JSONParser, MultiPartParser  # FormParser,
+from rest_framework.permissions import (  # DjangoModelPermissions,; DjangoModelPermissionsOrAnonReadOnly,
     AllowAny,
-    IsAuthenticated,
     IsAdminUser,
-    # DjangoModelPermissions,
-    # DjangoModelPermissionsOrAnonReadOnly,
+    IsAuthenticated,
 )
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+
+from .models import Album, Audio, Genre, Playlist
 
 # from rest_framework.views import APIView
-from .permission import IsArtistPermission, AudioUserWritePermission
-from .models import Album, Audio, Genre, Playlist
+from .permission import AudioUserWritePermission, IsArtistPermission
 from .serializers import (
+    AlbumSerializer,
     AudioSerializer,
     GenreSerializer,
-    AlbumSerializer,
     PlaylistSerializer,
 )
 

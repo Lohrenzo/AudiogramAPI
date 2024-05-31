@@ -1,13 +1,14 @@
-from django.urls import path
+import django_eventstream
+from django.urls import include, path
 
 from .views import (
-    AudioView,
-    AudioDetail,
-    GenreView,
     AlbumView,
-    PlaylistView,
-    PlaylistDetail,
+    AudioDetail,
+    AudioView,
+    GenreView,
     LikesView,
+    PlaylistDetail,
+    PlaylistView,
 )
 
 urlpatterns = [
@@ -26,4 +27,5 @@ urlpatterns = [
         PlaylistDetail.as_view(),
         name="playlist_detail",
     ),
+    path("events", include(django_eventstream.urls), {"channels": ["test"]}),
 ]

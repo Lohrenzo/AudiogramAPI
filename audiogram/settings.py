@@ -14,31 +14,27 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-# from decouple import config
+import environ
+
+env = environ.Env()
+# reading .env file
+environ.Env.read_env(env_file=".env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
-# ALLOWED_HOSTS = [
-#     "127.0.0.1",
-#     ".vercel.app",
-#     ".now.sh",
-# ]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -53,6 +49,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "djoser",
     "django_filters",
+    "django_eventstream",
     # "rest_framework_simplejwt",
     # "rest_framework_simplejwt.token_blacklist",
 ]
@@ -94,25 +91,21 @@ WSGI_APPLICATION = "audiogram.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        # "ENGINE": config("DB_ENGINE"),
-        # "HOST": config("DB_HOST"),
-        # "NAME": config("DB_NAME"),
-        # "USER": config("DB_USER"),
-        # "PASSWORD": config("DB_PASSWORD"),
-        # "PORT": config("DB_PORT"),
+        "ENGINE": env("DB_ENGINE"),
+        "HOST": env("DB_HOST"),
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "PORT": env("DB_PORT"),
     }
 }
 
-
-# Email
-# EMAIL_BACKEND = config("EMAIL_BACKEND")
-# EMAIL_HOST = config("EMAIL_HOST")
-# EMAIL_PORT = config("EMAIL_PORT")
-# EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-# EMAIL_USE_TLS = config("EMAIL_USE_TLS")
+print("DB_ENGINE:", env("DB_ENGINE"))
+print("DB_HOST:", env("DB_HOST"))
+print("DB_NAME:", env("DB_NAME"))
+print("DB_USER:", env("DB_USER"))
+print("DB_PASSWORD:", env("DB_PASSWORD"))
+print("DB_PORT:", env("DB_PORT"))
 
 
 # Password validation
@@ -242,7 +235,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
+    "SIGNING_KEY": os.environ.get("SECRET_KEY"),
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,
